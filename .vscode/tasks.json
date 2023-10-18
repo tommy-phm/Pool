@@ -1,0 +1,62 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compiling Pool Simulator Program (Windows)",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-g",
+                "-I${workspaceFolder}\\include",
+                "-L${workspaceFolder}\\lib",
+                "${workspaceFolder}\\resource\\resource.o",
+                "${workspaceFolder}\\src\\main.cpp",
+                "${workspaceFolder}\\src\\logic.cpp",
+                "${workspaceFolder}\\src\\graphics.cpp",
+                "${workspaceFolder}\\src\\glad.c",
+                "-lglfw3dll",
+                "-o",
+                "pool_simulator"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "windows": {
+                "command": "g++.exe"
+            }
+        },
+        {
+            "label": "Compiling Pool Simulator Program (Linux)",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-g",
+                "-I${workspaceFolder}/include",
+                "-L${workspaceFolder}/lib",
+                "${workspaceFolder}/src/main.cpp",
+                "${workspaceFolder}/src/logic.cpp",
+                "${workspaceFolder}/src/graphics.cpp",
+                "${workspaceFolder}/src/glad.c",
+                "-lglfw", // You will need to install libglfw and libglfw-dev package yourself
+                "-o",
+                "pool_simulator"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "linux": {
+                "command": "g++" // Specify the Linux g++ command
+            }
+        }
+    ]
+}
