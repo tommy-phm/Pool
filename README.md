@@ -1,8 +1,8 @@
 # Pool Simulator.
 
-Pool Simulator is a 2D simulation of a pool game, implemented in C++. Players can interacte by hiting around the cue ball with control over direction and force.
+Pool Simulator is a 2D simulation of a pool game, implemented in C++. Players can interact by hitting around the cue ball with control over direction and force.
 
-![Alt Text](resource/img.PNG)
+![Screenshot](resource/img.png)
 
 ## Table of Contents
 
@@ -37,7 +37,7 @@ For linux, you will need to install libglfw and libglfw-dev package yourself.
 ### Using Visual Studio Code
 
 1. Open the folder in Visual Studio Code.
-2. Run the build task to compile the code. Shortcut is Crtl-Shift-B.
+2. Run the build task to compile the code. The shortcut is Crtl-Shift-B.
 3. Select your operating system
 
 ### Using the Precompiled Version
