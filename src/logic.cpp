@@ -59,28 +59,54 @@ int ballCollsion(ball &b1, ball &b2){
     return true;
 }
 
+//Pocket
+void pocketEntry(ball &b){
+    b.moving = false;
+    b.show = false;
+    b.x = areaW;
+    b.y = areaH;
+    b.i = b.j = 0.0f;
+}
+
 //Check and apply wall collision
 int wallCollsion(ball &b){
     bool collision = false;
     if (b.x > halfAreaW){
-        b.x = areaW - b.x;
-        b.i = -b.i;
-        collision = true;
+        if(abs(b.y) < halfAreaH - ball_d){
+            b.x = areaW - b.x;
+            b.i = -b.i;
+            collision = true;     
+        }
+        else
+            pocketEntry(b);
     }
     else if(b.x < -halfAreaW){
-        b.x = -areaW - b.x;
-        b.i = -b.i;
-        collision = true;
+        if(abs(b.y) < halfAreaH - ball_d){
+            b.x = -areaW - b.x;
+            b.i = -b.i;
+            collision = true;
+        }
+        else
+            pocketEntry(b);
     }
     if (b.y > halfAreaH){
-        b.y = areaH - b.y;
-        b.j = -b.j;
-        collision = true;
+        if((ball_d < abs(b.x) && abs(b.x) < halfAreaW - ball_d)){
+            b.y = areaH - b.y;
+            b.j = -b.j;
+            collision = true;
+        }
+        else
+            pocketEntry(b);
+
     }
     else if(b.y < -halfAreaH){
-        b.y = -areaH - b.y;
-        b.j = -b.j;
-        collision = true;
+        if((ball_d < abs(b.x) && abs(b.x) < halfAreaW - ball_d)){
+            b.y = -areaH - b.y;
+            b.j = -b.j;
+            collision = true;
+        }
+        else
+            pocketEntry(b);
     }
     return collision;
 }
@@ -135,7 +161,6 @@ void setup(){
             n++;
         }
     }
-
     balls[ball_n - 1].x = 0.0f;
     balls[ball_n - 1].y = 0.0f;
 }

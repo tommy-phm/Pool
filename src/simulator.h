@@ -3,7 +3,7 @@
 #include <iostream>
 
 //Settings. Distance Unit are in inches
-const char areaW = 8 * 12; // 
+const char areaW = 8 * 12;
 const char areaH = areaW / 2;
 const char halfAreaW = 4 * 12;
 const char halfAreaH = halfAreaW / 2;
@@ -20,6 +20,7 @@ class ball{
         float i = 0.0f;
         float j = 0.0f;
         bool moving = false;
+        bool show = true;
 };
 
 extern ball balls[ball_n]; // Array of balls

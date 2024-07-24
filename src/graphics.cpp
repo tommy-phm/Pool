@@ -27,6 +27,8 @@ const float markerX = ballX / 3.0f;
 const float markerY = ballY / 3.0f;
 const float colX = (areaW  + ball_d * 2.5f)  / screenX; //Marker collium distance to center 
 const float rowY = (areaH + ball_d * 2.5f) / screenY; //Marker row distance to center 
+const float holeX = ballX * 2;
+const float holeY = ballY * 2; 
 
 //Ball color
 const float r[] = {1.0f, 0.07f, 0.9f, 0.41f, 0.97f, 0.23f, 0.64f, 0.09f, 1.0f, 0.07f, 0.9f, 0.41f, 0.97f, 0.23f, 0.64f, 1.0f};
@@ -52,32 +54,44 @@ float vertices[] = {
     -edgeX, edgeY, 0.0f,
 
     //Area
-    areaX,  areaY, 0.0f,
-    areaX,  -areaY, 0.0f,
-    -areaX,  -areaY, 0.0f,
-    -areaX,  areaY, 0.0f,
+    areaX, areaY, 0.0f,
+    areaX, -areaY, 0.0f,
+    -areaX, -areaY, 0.0f,
+    -areaX, areaY, 0.0f,
 
     //Ball
-    -0.70f * ballX,  0.70f * ballY, 0.0f,
-    0.0f * ballX,  1.0f * ballY, 0.0f,
-    0.70f * ballX,  0.70f * ballY, 0.0f,
-    1.0f * ballX,   0.0f * ballY, 0.0f,
+    -0.70f * ballX, 0.70f * ballY, 0.0f,
+    0.0f * ballX, 1.0f * ballY, 0.0f,
+    0.70f * ballX, 0.70f * ballY, 0.0f,
+    1.0f * ballX,  0.0f * ballY, 0.0f,
     0.70f * ballX, -0.70f * ballY, 0.0f,
-    0.0f * ballX,  -1.0f * ballY, 0.0f,
+    0.0f * ballX, -1.0f * ballY, 0.0f,
     -0.70f * ballX, -0.70f * ballY, 0.0f,
-    -1.0f * ballX,  0.0f * ballY, 0.0f,
+    -1.0f * ballX, 0.0f * ballY, 0.0f,
     
     //Marker
-    0.0f * markerX,  1.0f * markerY, 0.0f,
-    0.70f * markerX,  0.70f * markerY, 0.0f,
-    1.0f * markerX,   0.0f * markerY, 0.0f,
+    0.0f * markerX, 1.0f * markerY, 0.0f,
+    0.70f * markerX, 0.70f * markerY, 0.0f,
+    1.0f * markerX,  0.0f * markerY, 0.0f,
     0.70f * markerX, -0.70f * markerY, 0.0f,
-    0.0f * markerX,  -1.0f * markerY, 0.0f,
+    0.0f * markerX, -1.0f * markerY, 0.0f,
     -0.70f * markerX, -0.70f * markerY, 0.0f,
-    -1.0f * markerX,  0.0f * markerY, 0.0f,
-    -0.70f * markerX,  0.70f * markerY, 0.0f,
+    -1.0f * markerX, 0.0f * markerY, 0.0f,
+    -0.70f * markerX, 0.70f * markerY, 0.0f,
+
+    //Line
     0.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 0.0f,
+
+    //Hole
+    0.0f * holeX, 1.0f * holeY, 0.0f,
+    0.70f * holeX, 0.70f * holeY, 0.0f,
+    1.0f * holeX,  0.0f * holeY, 0.0f,
+    0.70f * holeX, -0.70f * holeY, 0.0f,
+    0.0f * holeX, -1.0f * holeY, 0.0f,
+    -0.70f * holeX, -0.70f * holeY, 0.0f,
+    -1.0f * holeX, 0.0f * holeY, 0.0f,
+    -0.70f * holeX, 0.70f * holeY, 0.0f,
 }; 
 
 const char* vertexShaderSource = R"(
@@ -242,11 +256,13 @@ void render(){
     glBindVertexArray(0); 
 
     glm::mat4 wallModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    glm::mat4 markerModel[20];
+    glm::mat4 holeModel[6];
     glm::mat4 edgeModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
     glm::mat4 areaModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
     glm::mat4 ballModel[ball_n];
     glm::mat4 lineModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-    glm::mat4 markerModel[20];
+
 
     GLint modelLocation = glGetUniformLocation(shaderProgram, "model");
     GLint colorLocation = glGetUniformLocation(shaderProgram, "color");
@@ -264,39 +280,19 @@ void render(){
         glUniform4f(colorLocation, 0.72f, 0.44f, 0.31f, 0.23f);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-        // Draw Edge
-        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(edgeModel));
-        glUniform4f(colorLocation, 0.35f, 0.41f, 0.53f, 1.0f);
-        glDrawArrays(GL_TRIANGLE_FAN, 4, 4);
-
-        // Draw Area
-        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(areaModel));
-        glUniform4f(colorLocation, 0.55f, 0.61f, 0.71f, 1.0f);
-        glDrawArrays(GL_TRIANGLE_FAN, 8, 4);
-
-        //Draw Ball
-        for(int i = 0; i < ball_n; i++){
-            ballModel[i] = glm::mat4(1.0f);
-            ballModel[i] = glm::translate(ballModel[i], glm::vec3(balls[i].x / halfX, balls[i].y / halfY, 0.0f));
-            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(ballModel[i]));
-            glUniform4f(colorLocation, r[i], g[i], b[i], 1.0f);
-            glDrawArrays(GL_TRIANGLE_FAN, 12, 8);
-            if(i > 7){
-                glUniform4f(colorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
-                glDrawArrays(GL_TRIANGLE_FAN, 12, 3);
-                glDrawArrays(GL_TRIANGLE_FAN, 16, 3);
-            }
-
-        }
-
-        //Draw aiming line
-        if(aiming){
-            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(lineModel));
-            glDrawArrays(GL_LINES, 28, 3);
-        }
-
         //Draw Markers
         int n = 0;
+
+        // Draw markers along the X-axis
+        for (int i = 0; i < 7; i++) {
+            for (int j = -1; j <= 1; j += 2) {
+                markerModel[n] = glm::translate(glm::mat4(1.0f), glm::vec3(((screenX / 2 - 36.0f + 12.0f * i) / screenX * 2.0f - 1.0), j * rowY, 0.0f));
+                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(markerModel[n]));
+                glUniform4f(colorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
+                glDrawArrays(GL_TRIANGLE_FAN, 20, 8);
+                n++;
+            }
+        }
 
         // Draw markers along the Y-axis
         for (int i = 0; i < 3; i++) {
@@ -309,15 +305,51 @@ void render(){
             }
         }
 
-        // Draw markers along the X-axis
-        for (int i = 0; i < 7; i++) {
-            for (int j = -1; j <= 1; j += 2) {
-                markerModel[n] = glm::translate(glm::mat4(1.0f), glm::vec3(((screenX / 2 - 36.0f + 12.0f * i) / screenX * 2.0f - 1.0), j * rowY, 0.0f));
-                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(markerModel[n]));
-                glUniform4f(colorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
-                glDrawArrays(GL_TRIANGLE_FAN, 20, 8);
-                n++;
+        // Draw Edge
+        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(edgeModel));
+        glUniform4f(colorLocation, 0.35f, 0.41f, 0.53f, 1.0f);
+        glDrawArrays(GL_TRIANGLE_FAN, 4, 4);
+
+        // Draw Hole
+        n = 0;
+        for (int i = 0; i < 3; i++) {
+            holeModel[n] = glm::translate(glm::mat4(1.0f), glm::vec3(((screenX / 2 - 48.0f + 48.0f * i) / screenX * 2.0f - 1.0), ((screenY / 2 - 24.0f) / screenY * 2.0f - 1.0f), 0.0f));
+            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(holeModel[n]));
+            glUniform4f(colorLocation, 0.0f, 0.0f, 0.0f, 1.0f);
+            glDrawArrays(GL_TRIANGLE_FAN, 30, 8);
+            n++;
+            holeModel[n] = glm::translate(glm::mat4(1.0f), glm::vec3(((screenX / 2 - 48.0f + 48.0f * i) / screenX * 2.0f - 1.0), ((screenY / 2 + 24.0f) / screenY * 2.0f - 1.0f), 0.0f));
+            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(holeModel[n]));
+            glUniform4f(colorLocation, 0.0f, 0.0f, 0.0f, 1.0f);
+            glDrawArrays(GL_TRIANGLE_FAN, 30, 8);
+            n++;
+        }
+
+        // Draw Area
+        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(areaModel));
+        glUniform4f(colorLocation, 0.55f, 0.61f, 0.71f, 1.0f);
+        glDrawArrays(GL_TRIANGLE_FAN, 8, 4);
+
+        //Draw Ball
+        for(int i = 0; i < ball_n; i++){
+            if(balls[i].show){
+                ballModel[i] = glm::mat4(1.0f);
+                ballModel[i] = glm::translate(ballModel[i], glm::vec3(balls[i].x / halfX, balls[i].y / halfY, 0.0f));
+                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(ballModel[i]));
+                glUniform4f(colorLocation, r[i], g[i], b[i], 1.0f);
+                glDrawArrays(GL_TRIANGLE_FAN, 12, 8);
+                if(i > 7){
+                    glUniform4f(colorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
+                    glDrawArrays(GL_TRIANGLE_FAN, 12, 3);
+                    glDrawArrays(GL_TRIANGLE_FAN, 16, 3);
+                }
             }
+        }
+
+        //Draw aiming line
+        if(aiming){
+            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(lineModel));
+            glDrawArrays(GL_LINES, 28, 3);
         }
 
         glfwSwapBuffers(window);
