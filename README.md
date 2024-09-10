@@ -54,5 +54,6 @@ To interact with the cue ball:
 
 ## References
 
+- [Pool Physics Property Constants](https://billiards.colostate.edu/faq/physics/physical-properties/): Constants used for calculation
 - [HTML5 & JavaScript Game Development Tutorial](https://spicyyoghurt.com/tutorials/html5-javascript-game-development/collision-detection-physics): Circle collision tutorial
 - [Black Octagon](https://globalsymbols.com/symbolsets/openmoji/symbols/44281?locale=en): Image use for the icon
