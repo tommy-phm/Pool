@@ -10,8 +10,6 @@ const char halfAreaH = halfAreaW / 2;
 
 const char ball_n = 16; // Number of ball
 const float ball_d = 2.25f; // Ball Diameter
-const float ball_f = 0.001f; // Ball Friction Constant
-const float e = 0.95f; //Coefficient of resitution.
 
 class ball{
     public:

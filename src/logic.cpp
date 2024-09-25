@@ -3,17 +3,22 @@
 #include "simulator.h"
 
 ball balls[ball_n];
-const char fps = 120;
+const char fps = 120.0f;
+const float peroid = 1.0f / fps; //Time per tick
+const float cR = 0.95f; //Ball to ball coefficient  of restitution (e).
+const float cRR = 0.01f; //Ball to cloth coefficient of Rolling Resistance (μ)
+const float gravity = 386.08858267717f; // Gravity Acceleration (in / s^2)
+const float deceleration = cRR * gravity * peroid; // Deceleration per tick
 
 //Move ball and apply friction
 void move(ball &b){
-    b.x += b.i;
-    b.y += b.j;
-
     float magatudie = std::abs(b.i) + std::abs(b.j);
-    if(magatudie > ball_f){
-        b.i = b.i - ball_f * b.i / magatudie;
-        b.j = b.j - ball_f * b.j / magatudie;
+    b.x += b.i * peroid - 0.5f * deceleration * (b.i / magatudie) * peroid;
+    b.y += b.j * peroid - 0.5f * deceleration * (b.j / magatudie) * peroid; 
+    
+    if(magatudie > deceleration){
+        b.i -= deceleration * (b.i / magatudie);
+        b.j -= deceleration * (b.j / magatudie);
     }else{
         b.moving = false;
         b.i = 0.0f;
@@ -47,10 +52,10 @@ int ballCollsion(ball &b1, ball &b2){
         // Calculate speed
         float impulse = vRelativeVelocityX * vCollisionNormX + vRelativeVelocityY * vCollisionNormY;
 
-        b1.i -= impulse * vCollisionNormX * e;
-        b1.j -= impulse * vCollisionNormY * e;
-        b2.i += impulse * vCollisionNormX * e;
-        b2.j += impulse * vCollisionNormY * e;
+        b1.i -= impulse * vCollisionNormX * cR;
+        b1.j -= impulse * vCollisionNormY * cR;
+        b2.i += impulse * vCollisionNormX * cR;
+        b2.j += impulse * vCollisionNormY * cR;
 
         b2.moving = true;
 
@@ -72,7 +77,7 @@ void pocketEntry(ball &b){
 int wallCollsion(ball &b){
     bool collision = false;
     if (b.x > halfAreaW){
-        if(abs(b.y) < halfAreaH - ball_d){
+        if(abs(b.y) < halfAreaH - ball_d / 2.0f){
             b.x = areaW - b.x;
             b.i = -b.i;
             collision = true;     
@@ -81,7 +86,7 @@ int wallCollsion(ball &b){
             pocketEntry(b);
     }
     else if(b.x < -halfAreaW){
-        if(abs(b.y) < halfAreaH - ball_d){
+        if(abs(b.y) < halfAreaH - ball_d/ 2.0f){
             b.x = -areaW - b.x;
             b.i = -b.i;
             collision = true;
@@ -90,7 +95,7 @@ int wallCollsion(ball &b){
             pocketEntry(b);
     }
     if (b.y > halfAreaH){
-        if((ball_d < abs(b.x) && abs(b.x) < halfAreaW - ball_d)){
+        if((ball_d / 2.0f < abs(b.x) && abs(b.x) < halfAreaW - ball_d / 2.0f)){
             b.y = areaH - b.y;
             b.j = -b.j;
             collision = true;
@@ -100,7 +105,7 @@ int wallCollsion(ball &b){
 
     }
     else if(b.y < -halfAreaH){
-        if((ball_d < abs(b.x) && abs(b.x) < halfAreaW - ball_d)){
+        if((ball_d / 2.0f < abs(b.x) && abs(b.x) < halfAreaW - ball_d / 2.0f)){
             b.y = -areaH - b.y;
             b.j = -b.j;
             collision = true;
@@ -128,21 +133,20 @@ void tick(){
     }    
 }
 
+// Simulate a tick after each peroid
 void run(){
-    auto lastTime = std::chrono::high_resolution_clock::now();
-    const double nsPerTick = 1000000000.0 / fps; // Limits tick rate to fps
-
-    long lastTimer = 0; 
+    auto lastperoid = std::chrono::high_resolution_clock::now();
+    long lastperoidr = 0; 
     double delta = 0;
     while (!endGame) {
         auto now = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> elapsed = now - lastTime;
-        lastTime = now;
+        std::chrono::duration<double> elapsed = now - lastperoid;
+        lastperoid = now;
 
-        delta += elapsed.count() * 1000000000.0; // Convert seconds to nanoseconds
+        delta += elapsed.count();
 
-        while (delta >= nsPerTick) {
-            delta -= nsPerTick;
+        while (delta >= peroid) {
+            delta -= peroid;
             if (active)
                 tick();
         }

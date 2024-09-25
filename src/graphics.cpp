@@ -11,12 +11,15 @@ const float screenX = areaW + ball_d * 4.0f + 12.0f;
 const float screenY = areaH + ball_d * 4.0f + 12.0f;
 const float halfX = screenX / 2.0f;
 const float halfY = screenY / 2.0f;
-const unsigned int SCR_WIDTH = 1200;
+const unsigned int SCR_WIDTH = 1500;
 const unsigned int SCR_HEIGHT = SCR_WIDTH * screenY / screenX;
 
 // Ratio Scale
-const float wallX = (areaW  + ball_d * 4.0f) / screenX;
-const float wallY = (areaH + ball_d * 4.0f) / screenY;
+const float wallX1 = (areaW + ball_d * 4.0f) / screenX;
+const float wallX2 = (areaW + ball_d * 2.0f) / screenX;
+const float wallY1 = (areaH + ball_d * 4.0f) / screenY;
+const float wallY2 = (areaH + ball_d * 2.0f) / screenY;
+
 const float edgeX = (areaW  + ball_d) / screenX;
 const float edgeY = (areaH + ball_d) / screenY;
 const float areaX = areaW / screenX;
@@ -27,8 +30,8 @@ const float markerX = ballX / 3.0f;
 const float markerY = ballY / 3.0f;
 const float colX = (areaW  + ball_d * 2.5f)  / screenX; //Marker collium distance to center 
 const float rowY = (areaH + ball_d * 2.5f) / screenY; //Marker row distance to center 
-const float holeX = ballX * 2;
-const float holeY = ballY * 2; 
+const float holeX = ballX * 1.5f;
+const float holeY = ballY * 1.5f; 
 
 //Ball color
 const float r[] = {1.0f, 0.07f, 0.9f, 0.41f, 0.97f, 0.23f, 0.64f, 0.09f, 1.0f, 0.07f, 0.9f, 0.41f, 0.97f, 0.23f, 0.64f, 1.0f};
@@ -37,21 +40,45 @@ const float b[] = {0.38f, 0.54f, 0.27f, 0.42f, 0.13f, 0.28f, 0.2f, 0.15f, 0.38f,
 
 //Aimming Settings
 const float aimmingLimit = 12.0f; // Max aiming line length
-const float powerFactor = 0.15f; // Aiming power factor
+const float maxValocity = 100.0f; // Aiming power factor
 
 // Object Model
 float vertices[] = {
-    //Ball
-    wallX, wallY, 0.0f,
-    wallX, -wallY, 0.0f,
-    -wallX, -wallY, 0.0f,
-    -wallX, wallY, 0.0f,
+    //Wall
+    wallX2, wallY1, 0.0f,
+    wallX1, wallY2, 0.0f,
+    wallX1, -wallY2, 0.0f,
+    wallX2, -wallY1, 0.0f,
+    -wallX2, -wallY1, 0.0f,
+    -wallX1, -wallY2, 0.0f,
+    -wallX1, wallY2, 0.0f,
+    -wallX2, wallY1, 0.0f,
+
+    //Marker
+    0.0f * markerX, 1.0f * markerY, 0.0f,
+    0.70f * markerX, 0.70f * markerY, 0.0f,
+    1.0f * markerX,  0.0f * markerY, 0.0f,
+    0.70f * markerX, -0.70f * markerY, 0.0f,
+    0.0f * markerX, -1.0f * markerY, 0.0f,
+    -0.70f * markerX, -0.70f * markerY, 0.0f,
+    -1.0f * markerX, 0.0f * markerY, 0.0f,
+    -0.70f * markerX, 0.70f * markerY, 0.0f,
 
     //Edge
     edgeX, edgeY, 0.0f,
     edgeX, -edgeY, 0.0f,
     -edgeX, -edgeY, 0.0f,
     -edgeX, edgeY, 0.0f,
+
+    //Hole
+    0.0f * holeX, 1.0f * holeY, 0.0f,
+    0.70f * holeX, 0.70f * holeY, 0.0f,
+    1.0f * holeX,  0.0f * holeY, 0.0f,
+    0.70f * holeX, -0.70f * holeY, 0.0f,
+    0.0f * holeX, -1.0f * holeY, 0.0f,
+    -0.70f * holeX, -0.70f * holeY, 0.0f,
+    -1.0f * holeX, 0.0f * holeY, 0.0f,
+    -0.70f * holeX, 0.70f * holeY, 0.0f,
 
     //Area
     areaX, areaY, 0.0f,
@@ -68,30 +95,10 @@ float vertices[] = {
     0.0f * ballX, -1.0f * ballY, 0.0f,
     -0.70f * ballX, -0.70f * ballY, 0.0f,
     -1.0f * ballX, 0.0f * ballY, 0.0f,
-    
-    //Marker
-    0.0f * markerX, 1.0f * markerY, 0.0f,
-    0.70f * markerX, 0.70f * markerY, 0.0f,
-    1.0f * markerX,  0.0f * markerY, 0.0f,
-    0.70f * markerX, -0.70f * markerY, 0.0f,
-    0.0f * markerX, -1.0f * markerY, 0.0f,
-    -0.70f * markerX, -0.70f * markerY, 0.0f,
-    -1.0f * markerX, 0.0f * markerY, 0.0f,
-    -0.70f * markerX, 0.70f * markerY, 0.0f,
 
-    //Line
+    //Aiming Line
     0.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 0.0f,
-
-    //Hole
-    0.0f * holeX, 1.0f * holeY, 0.0f,
-    0.70f * holeX, 0.70f * holeY, 0.0f,
-    1.0f * holeX,  0.0f * holeY, 0.0f,
-    0.70f * holeX, -0.70f * holeY, 0.0f,
-    0.0f * holeX, -1.0f * holeY, 0.0f,
-    -0.70f * holeX, -0.70f * holeY, 0.0f,
-    -1.0f * holeX, 0.0f * holeY, 0.0f,
-    -0.70f * holeX, 0.70f * holeY, 0.0f,
 }; 
 
 const char* vertexShaderSource = R"(
@@ -116,21 +123,20 @@ GLFWwindow* window;
 unsigned int VBO, VAO;
 bool aiming = false;
 
-
-// Limits aimming line to 12in
+// Limits aimming line to within aimming limit
 static void cursorPositionCallback( GLFWwindow *window, double xpos, double ypos ){
     if(aiming){
-        vertices[87] = (static_cast<float>(xpos) / SCR_WIDTH) * 2.0f - 1.0f;
-        vertices[88] = (1.0f -(static_cast<float>(ypos) / SCR_HEIGHT)) * 2.0f -1.0f;
-        float x = (vertices[84] - vertices[87]);
-        float y = (vertices[85] - vertices[88]);
+        vertices[123] = (static_cast<float>(xpos) / SCR_WIDTH) * 2.0f - 1.0f;
+        vertices[124] = (1.0f -(static_cast<float>(ypos) / SCR_HEIGHT)) * 2.0f -1.0f;
+        float x = (vertices[120] - vertices[123]);
+        float y = (vertices[121] - vertices[124]);
         float normalX = x * screenX / 2.0f;
         float normalY = y * screenY / 2.0f;
         float distance = sqrt(pow(normalX, 2) + pow(normalY, 2));
-        if(distance > 10.0f){
-            float ratio = distance / 10.0f;
-            vertices[87] = vertices[84] - x / ratio;
-            vertices[88] = vertices[85] - y / ratio;
+        if(distance > aimmingLimit){
+            float ratio = distance / aimmingLimit;
+            vertices[123] = vertices[120] - x / ratio;
+            vertices[124] = vertices[121] - y / ratio;
         }
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -149,21 +155,25 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             float x2 = (static_cast<float>(xpos) / SCR_WIDTH) * 2.0f - 1.0f;
             float y2 = (1.0f -(static_cast<float>(ypos) / SCR_HEIGHT)) * 2.0f -1.0f;
 
-            //Aiming is only enable if cursor is within 12in of white ball
-            if((pow((x2 - x1), 2) / pow(24 / screenX, 2) +  pow((y2 - y1), 2) / pow(24 / screenY, 2)) < 1){
+            //Aiming is only enable if cursor is within aimming limit of white ball
+            if((pow((x2 - x1), 2) / pow(aimmingLimit * 2.0f / screenX, 2) +  pow((y2 - y1), 2) / pow(aimmingLimit * 2.0f / screenY, 2)) < 1){
                 aiming = true;
-                vertices[84] = x1;
-                vertices[85] = y1;
-                vertices[87] = x2;
-                vertices[88] = y2;
+                vertices[120] = x1;
+                vertices[121] = y1;
+                vertices[123] = x2;
+                vertices[124] = y2;
                 glBindBuffer(GL_ARRAY_BUFFER, VBO);
                 glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
             }
         } 
         else if (action == GLFW_RELEASE && aiming) {
             aiming = false;
-            float i = (vertices[84] - vertices[87]) * screenX / 2.0f * powerFactor;
-            float j = (vertices[85] - vertices[88]) * screenY / 2.0f * powerFactor;
+            float i = (vertices[120] - vertices[123]) * screenX / 2.0f / aimmingLimit;
+            float j = (vertices[121] - vertices[124]) * screenY / 2.0f / aimmingLimit;
+            float length = sqrt(pow(i, 2) + pow(j, 2));
+            float magatudie = std::abs(i) + std::abs(j);
+            i = i / magatudie * maxValocity;
+            j = j / magatudie * maxValocity;
             hit(i, j);
         }
     }
@@ -257,8 +267,8 @@ void render(){
 
     glm::mat4 wallModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
     glm::mat4 markerModel[20];
-    glm::mat4 holeModel[6];
     glm::mat4 edgeModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    glm::mat4 holeModel[6];
     glm::mat4 areaModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
     glm::mat4 ballModel[ball_n];
     glm::mat4 lineModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -278,7 +288,7 @@ void render(){
         // Draw Wall
         glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(wallModel));
         glUniform4f(colorLocation, 0.72f, 0.44f, 0.31f, 0.23f);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 8);
 
         //Draw Markers
         int n = 0;
@@ -289,7 +299,7 @@ void render(){
                 markerModel[n] = glm::translate(glm::mat4(1.0f), glm::vec3(((screenX / 2 - 36.0f + 12.0f * i) / screenX * 2.0f - 1.0), j * rowY, 0.0f));
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(markerModel[n]));
                 glUniform4f(colorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
-                glDrawArrays(GL_TRIANGLE_FAN, 20, 8);
+                glDrawArrays(GL_TRIANGLE_FAN, 8, 8);
                 n++;
             }
         }
@@ -300,7 +310,7 @@ void render(){
                 markerModel[n] = glm::translate(glm::mat4(1.0f), glm::vec3(j * colX, ((screenY / 2 - 12.0f + 12.0f * i) / screenY * 2.0f - 1.0f), 0.0f));
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(markerModel[n]));
                 glUniform4f(colorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
-                glDrawArrays(GL_TRIANGLE_FAN, 20, 8);
+                glDrawArrays(GL_TRIANGLE_FAN, 8, 8);
                 n++;
             }
         }
@@ -308,7 +318,7 @@ void render(){
         // Draw Edge
         glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(edgeModel));
         glUniform4f(colorLocation, 0.35f, 0.41f, 0.53f, 1.0f);
-        glDrawArrays(GL_TRIANGLE_FAN, 4, 4);
+        glDrawArrays(GL_TRIANGLE_FAN, 16, 4);
 
         // Draw Hole
         n = 0;
@@ -316,19 +326,19 @@ void render(){
             holeModel[n] = glm::translate(glm::mat4(1.0f), glm::vec3(((screenX / 2 - 48.0f + 48.0f * i) / screenX * 2.0f - 1.0), ((screenY / 2 - 24.0f) / screenY * 2.0f - 1.0f), 0.0f));
             glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(holeModel[n]));
             glUniform4f(colorLocation, 0.0f, 0.0f, 0.0f, 1.0f);
-            glDrawArrays(GL_TRIANGLE_FAN, 30, 8);
+            glDrawArrays(GL_TRIANGLE_FAN, 20, 8);
             n++;
             holeModel[n] = glm::translate(glm::mat4(1.0f), glm::vec3(((screenX / 2 - 48.0f + 48.0f * i) / screenX * 2.0f - 1.0), ((screenY / 2 + 24.0f) / screenY * 2.0f - 1.0f), 0.0f));
             glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(holeModel[n]));
             glUniform4f(colorLocation, 0.0f, 0.0f, 0.0f, 1.0f);
-            glDrawArrays(GL_TRIANGLE_FAN, 30, 8);
+            glDrawArrays(GL_TRIANGLE_FAN, 20, 8);
             n++;
         }
 
         // Draw Area
         glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(areaModel));
         glUniform4f(colorLocation, 0.55f, 0.61f, 0.71f, 1.0f);
-        glDrawArrays(GL_TRIANGLE_FAN, 8, 4);
+        glDrawArrays(GL_TRIANGLE_FAN, 28, 4);
 
         //Draw Ball
         for(int i = 0; i < ball_n; i++){
@@ -337,11 +347,11 @@ void render(){
                 ballModel[i] = glm::translate(ballModel[i], glm::vec3(balls[i].x / halfX, balls[i].y / halfY, 0.0f));
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(ballModel[i]));
                 glUniform4f(colorLocation, r[i], g[i], b[i], 1.0f);
-                glDrawArrays(GL_TRIANGLE_FAN, 12, 8);
+                glDrawArrays(GL_TRIANGLE_FAN, 32, 8);
                 if(i > 7){
                     glUniform4f(colorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
-                    glDrawArrays(GL_TRIANGLE_FAN, 12, 3);
-                    glDrawArrays(GL_TRIANGLE_FAN, 16, 3);
+                    glDrawArrays(GL_TRIANGLE_FAN, 32, 3);
+                    glDrawArrays(GL_TRIANGLE_FAN, 36, 3);
                 }
             }
         }
@@ -349,7 +359,7 @@ void render(){
         //Draw aiming line
         if(aiming){
             glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(lineModel));
-            glDrawArrays(GL_LINES, 28, 3);
+            glDrawArrays(GL_LINES, 40, 2);
         }
 
         glfwSwapBuffers(window);
