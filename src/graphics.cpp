@@ -29,7 +29,7 @@ const float ballY = ball_d / screenY;
 const float markerX = ballX / 3.0f;
 const float markerY = ballY / 3.0f;
 const float colX = (areaW  + ball_d * 2.5f)  / screenX; //Marker collium distance to center 
-const float rowY = (areaH + ball_d * 2.5f) / screenY; //Marker row distance to center 
+const float rowY = (areaH + ball_d * 2.5f) / screenY;   //Marker row distance to center 
 const float holeX = ballX * 1.5f;
 const float holeY = ballY * 1.5f; 
 
@@ -40,7 +40,7 @@ const float b[] = {0.38f, 0.54f, 0.27f, 0.42f, 0.13f, 0.28f, 0.2f, 0.15f, 0.38f,
 
 //Aimming Settings
 const float aimmingLimit = 12.0f; // Max aiming line length
-const float maxValocity = 100.0f; // Aiming power factor
+const float maxValocity = 200.0f; // Aiming hitting velecoity
 
 // Object Model
 float vertices[] = {

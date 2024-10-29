@@ -1,13 +1,17 @@
 #include <cmath>
 #include <chrono>
 #include "simulator.h"
+#include <iostream>
+#include <cstdlib>
+#include <iomanip>
 
 ball balls[ball_n];
 const char fps = 120.0f;
-const float peroid = 1.0f / fps; //Time per tick
-const float cR = 0.95f; //Ball to ball coefficient  of restitution (e).
-const float cRR = 0.01f; //Ball to cloth coefficient of Rolling Resistance (μ)
-const float gravity = 386.08858267717f; // Gravity Acceleration (in / s^2)
+const float peroid = 1.0f / fps;                   //Time per tick
+const float cR = 0.95f;                            //Ball to ball coefficient of restitution (e).
+const float cRR = 0.01f;                           //Ball to cloth coefficient of Rolling Resistance (μ)
+const float BR = 0.75f;                            //Ball to rail coefficient of restitution (e).
+const float gravity = 386.08858267717f;            // Gravity Acceleration (in / s^2)
 const float deceleration = cRR * gravity * peroid; // Deceleration per tick
 
 //Move ball and apply friction
@@ -58,7 +62,6 @@ int ballCollsion(ball &b1, ball &b2){
         b2.j += impulse * vCollisionNormY * cR;
 
         b2.moving = true;
-
     }else
         return false;
     return true;
@@ -79,7 +82,8 @@ int wallCollsion(ball &b){
     if (b.x > halfAreaW){
         if(abs(b.y) < halfAreaH - ball_d / 2.0f){
             b.x = areaW - b.x;
-            b.i = -b.i;
+            b.i = -b.i * BR;
+            b.j = b.j * BR;
             collision = true;     
         }
         else
@@ -88,7 +92,8 @@ int wallCollsion(ball &b){
     else if(b.x < -halfAreaW){
         if(abs(b.y) < halfAreaH - ball_d/ 2.0f){
             b.x = -areaW - b.x;
-            b.i = -b.i;
+            b.i = -b.i * BR;
+            b.j = b.j * BR;
             collision = true;
         }
         else
@@ -97,7 +102,8 @@ int wallCollsion(ball &b){
     if (b.y > halfAreaH){
         if((ball_d / 2.0f < abs(b.x) && abs(b.x) < halfAreaW - ball_d / 2.0f)){
             b.y = areaH - b.y;
-            b.j = -b.j;
+            b.i = b.i * BR;
+            b.j = -b.j * BR;
             collision = true;
         }
         else
@@ -107,7 +113,8 @@ int wallCollsion(ball &b){
     else if(b.y < -halfAreaH){
         if((ball_d / 2.0f < abs(b.x) && abs(b.x) < halfAreaW - ball_d / 2.0f)){
             b.y = -areaH - b.y;
-            b.j = -b.j;
+            b.i = b.i * BR;
+            b.j = -b.j * BR;
             collision = true;
         }
         else
@@ -153,13 +160,23 @@ void run(){
     }
 }
 
+// Simulate a round
+void simulateRound(){
+    active = true;
+    while (true) {
+        tick();
+        if (active)
+            return;
+    }
+}
+
 // Intilized ball
 void setup(){
     int n = 0;
     for (int i = 0; i <= 5; i++) {
+        float xOffset = halfAreaW / 2.0f + i * ball_d / 2.0f * sqrt(3.0f);
         float yOffset = -i * ball_d / 2.0f;
-        float xOffset = halfAreaW / 2.0f - ball_d + i * ball_d / 2.0f * sqrt(3.0f);
-        for (int j = 0; j < i; j++) {
+        for (int j = 0; j <= i; j++) {
             balls[n].x = xOffset;
             balls[n].y = yOffset + j * ball_d;
             n++;
