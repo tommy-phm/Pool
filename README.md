@@ -1,8 +1,7 @@
 # Pool Simulator.
 
-Pool Simulator is a 2D simulation of a pool game, implemented in C++. Players can interact by hitting around the cue ball with control over direction and force.
-
-![Screenshot](resource/img.png)
+Pool Simulator is a 2D simulation of a pool game, implemented in C++. 
+![Cue Break](resource/shoot.gif)
 
 ## Table of Contents
 
