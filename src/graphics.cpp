@@ -19,7 +19,6 @@ const float wallX1 = (areaW + ball_d * 4.0f) / screenX;
 const float wallX2 = (areaW + ball_d * 2.0f) / screenX;
 const float wallY1 = (areaH + ball_d * 4.0f) / screenY;
 const float wallY2 = (areaH + ball_d * 2.0f) / screenY;
-
 const float edgeX = (areaW  + ball_d) / screenX;
 const float edgeY = (areaH + ball_d) / screenY;
 const float areaX = areaW / screenX;
@@ -28,8 +27,8 @@ const float ballX = ball_d / screenX;
 const float ballY = ball_d / screenY;
 const float markerX = ballX / 3.0f;
 const float markerY = ballY / 3.0f;
-const float colX = (areaW  + ball_d * 2.5f)  / screenX; //Marker collium distance to center 
-const float rowY = (areaH + ball_d * 2.5f) / screenY;   //Marker row distance to center 
+const float colX = (areaW  + ball_d * 2.5f)  / screenX; // Marker collium distance to center 
+const float rowY = (areaH + ball_d * 2.5f) / screenY;   // Marker row distance to center 
 const float holeX = ballX * 1.5f;
 const float holeY = ballY * 1.5f; 
 
@@ -40,7 +39,6 @@ const float b[] = {0.38f, 0.54f, 0.27f, 0.42f, 0.13f, 0.28f, 0.2f, 0.15f, 0.38f,
 
 //Aimming Settings
 const float aimmingLimit = 12.0f; // Max aiming line length
-const float maxValocity = 200.0f; // Aiming hitting velecoity
 
 // Object Model
 float vertices[] = {
@@ -172,6 +170,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             float j = (vertices[121] - vertices[124]) * screenY / 2.0f / aimmingLimit;
             float length = sqrt(pow(i, 2) + pow(j, 2));
             float magatudie = std::abs(i) + std::abs(j);
+            //std::cout << i / magatudie << j / magatudie << std::endl;
             i = i / magatudie * maxValocity;
             j = j / magatudie * maxValocity;
             hit(i, j);
@@ -182,7 +181,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 // Setup and display graphics
 void render(){
     if (!glfwInit()) {
-    std::cerr << "Failed to initialize GLFW" << std::endl;
+    std::cerr<< "[ERROR] Failed to initialize GLFW" << std::endl;
     return;
     }
 
@@ -203,13 +202,13 @@ void render(){
     glfwMakeContextCurrent(window);
     
     if (window == NULL){
-        std::cout << "[Pool Simulator] ERROR: Failed to create GLFW window" << std::endl;
+        std::cerr<< "[ERROR] Failed to create GLFW window" << std::endl;
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
-        std::cout << "[Pool Simulator] ERROR: Failed to initialize GLAD" << std::endl;
+        std::cerr<< "[ERROR] Failed to initialize GLAD" << std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -224,7 +223,7 @@ void render(){
 
     if (!success){
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "[Pool Simulator] ERROR: SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        std::cerr<< "[ERROR] SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -235,7 +234,7 @@ void render(){
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if (!success){
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "[Pool Simulator] ERROR: SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+        std::cerr<< "[ERROR] SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -247,7 +246,7 @@ void render(){
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "[Pool Simulator] ERROR: SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        std::cerr<< "[ERROR] SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
         exit(EXIT_FAILURE);
     }
     glDeleteShader(vertexShader);
@@ -277,9 +276,9 @@ void render(){
     GLint modelLocation = glGetUniformLocation(shaderProgram, "model");
     GLint colorLocation = glGetUniformLocation(shaderProgram, "color");
 
-    std::cout << "[Pool Simulator] Graphic module has sucessfully loaded\n";
-    std::cout << "[Pool Simulator] Game is now ready. Have fun!\n";
-    while (!glfwWindowShouldClose(window)){
+    std::cout << "[INFO] Graphics renderer initialized successfully.\n";
+
+    while (!glfwWindowShouldClose(window) && running){
         glClearColor(0.15f, 0.17f, 0.27f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shaderProgram);
@@ -365,16 +364,11 @@ void render(){
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteProgram(shaderProgram);
+    glfwDestroyWindow(window);
     glfwTerminate();
-    endGame = true;
-}
-
-void closeWindow() {
-    if (window) 
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    running = false;
 }
 

@@ -12,9 +12,11 @@
                 "${workspaceFolder}\\resource\\resource.o",
                 "${workspaceFolder}\\src\\main.cpp",
                 "${workspaceFolder}\\src\\logic.cpp",
+                "${workspaceFolder}\\src\\network.cpp",
                 "${workspaceFolder}\\src\\graphics.cpp",
                 "${workspaceFolder}\\src\\glad.c",
                 "-lglfw3dll",
+                "-lws2_32",
                 "-o",
                 "pool_simulator"
             ],
@@ -40,9 +42,10 @@
                 "-L${workspaceFolder}/lib",
                 "${workspaceFolder}/src/main.cpp",
                 "${workspaceFolder}/src/logic.cpp",
+                "${workspaceFolder}/src/network.cpp",
                 "${workspaceFolder}/src/graphics.cpp",
                 "${workspaceFolder}/src/glad.c",
-                "-lglfw", // You will need to install libglfw and libglfw-dev package yourself
+                "-lglfw", // You will need to install libglfw3-dev package
                 "-o",
                 "pool_simulator"
             ],
@@ -55,7 +58,7 @@
                 "panel": "shared"
             },
             "linux": {
-                "command": "g++" // Specify the Linux g++ command
+                "command": "g++"
             }
         }
     ]

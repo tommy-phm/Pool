@@ -11,23 +11,29 @@ const float peroid = 1.0f / fps;                   //Time per tick
 const float cR = 0.95f;                            //Ball to ball coefficient of restitution (e).
 const float cRR = 0.01f;                           //Ball to cloth coefficient of Rolling Resistance (μ)
 const float BR = 0.75f;                            //Ball to rail coefficient of restitution (e).
-const float gravity = 386.08858267717f;            // Gravity Acceleration (in / s^2)
-const float deceleration = cRR * gravity * peroid; // Deceleration per tick
+const float gravity = 386.08858267717f;            //Gravity Acceleration (in / s^2)
+const float deceleration = cRR * gravity * peroid; //Deceleration per tick
 
 //Move ball and apply friction
 void move(ball &b){
     float magatudie = std::abs(b.i) + std::abs(b.j);
-    b.x += b.i * peroid - 0.5f * deceleration * (b.i / magatudie) * peroid;
-    b.y += b.j * peroid - 0.5f * deceleration * (b.j / magatudie) * peroid; 
-    
-    if(magatudie > deceleration){
-        b.i -= deceleration * (b.i / magatudie);
-        b.j -= deceleration * (b.j / magatudie);
-    }else{
+    if (magatudie > 0.0f) {
+        b.x += b.i * peroid - 0.5f * deceleration * (b.i / magatudie) * peroid;
+        b.y += b.j * peroid - 0.5f * deceleration * (b.j / magatudie) * peroid;
+        
+        if (magatudie > deceleration) {
+            b.i -= deceleration * (b.i / magatudie);
+            b.j -= deceleration * (b.j / magatudie);
+        } else {
+            b.moving = false;
+            b.i = 0.0f;
+            b.j = 0.0f;
+        }
+    } else {
         b.moving = false;
         b.i = 0.0f;
         b.j = 0.0f;
-    }    
+    }
 }
 
 //Check and apply ball collision
@@ -36,7 +42,7 @@ int ballCollsion(ball &b1, ball &b2){
     float vCollisionX = b2.x - b1.x;
     float vCollisionY = b2.y - b1.y;
     float distance = std::sqrt(vCollisionX * vCollisionX + vCollisionY * vCollisionY);
-    if (distance <= ball_d){
+    if (b1.show and b2.show and distance <= ball_d){
         
         // Seperate Overplaping Balls
         float overLap = 0.5f * (distance - ball_d);
@@ -71,8 +77,8 @@ int ballCollsion(ball &b1, ball &b2){
 void pocketEntry(ball &b){
     b.moving = false;
     b.show = false;
-    b.x = areaW;
-    b.y = areaH;
+    b.x = halfAreaW;
+    b.y = halfAreaH;
     b.i = b.j = 0.0f;
 }
 
@@ -140,12 +146,13 @@ void tick(){
     }    
 }
 
-// Simulate a tick after each peroid
-void run(){
+// Simulate a tick every peroid
+void simulateGame(){
     auto lastperoid = std::chrono::high_resolution_clock::now();
     long lastperoidr = 0; 
     double delta = 0;
-    while (!endGame) {
+    std::cout << "[INFO] Physics engine started.\n";
+    while (running) {
         auto now = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = now - lastperoid;
         lastperoid = now;
@@ -163,11 +170,8 @@ void run(){
 // Simulate a round
 void simulateRound(){
     active = true;
-    while (true) {
+    while (active) 
         tick();
-        if (active)
-            return;
-    }
 }
 
 // Intilized ball
@@ -190,6 +194,8 @@ void setup(){
 void hit(float i, float j){
     balls[ball_n - 1].i = i; 
     balls[ball_n - 1].j = j;
+    if (gameMode == 1 || gameMode == 2) 
+        sendGameState();
     balls[ball_n - 1].moving = true;
     active = true;
 }

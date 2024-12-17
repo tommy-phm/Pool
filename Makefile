@@ -11,7 +11,7 @@ LIB_DIRS := -L./lib
 RESOURCE_OBJ = resource/resource.o
 
 # Source files
-SRC_FILES := src/main.cpp src/logic.cpp src/graphics.cpp src/glad.c
+SRC_FILES := src/main.cpp src/logic.cpp src/network.cpp src/graphics.cpp src/glad.c
 
 # Output executable name
 OUTPUT := pool_simulator
@@ -20,7 +20,7 @@ OUTPUT := pool_simulator
 ifeq ($(OS),Windows_NT)
 	OBJECTS += $(RESOURCE_OBJ)
     OUTPUT := $(OUTPUT).exe
-    LIBS := -lglfw3dll
+    LIBS := -lglfw3dll -lws2_32
 else
 # Linux-specific settings
     LIBS := -lglfw
